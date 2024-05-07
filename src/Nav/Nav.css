@@ -1,0 +1,108 @@
+
+#viewport {
+  padding-left: 250px;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#content {
+  width: 100%;
+  position: relative;
+  margin-right: 0;
+}
+#sidebar {
+  z-index: 1000;
+  position: fixed;
+  left: 250px;
+  width: 250px;
+  height: 100%;
+  margin-left: -250px;
+  overflow-y: auto;
+  background: #37474F;
+  /* -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease; */
+}
+#sidebar{
+    width: 351px;
+    background-color: white;
+    border-right: 1px solid #F1F4F9
+}
+#sidebar header {
+  border-bottom:1px solid #F1F4F9;
+  border-right: 1px solid #F1F4F9;
+  height: 101.96px;
+  display: flex;
+  align-items: center;
+}
+#sidebar img{
+    margin-left: 50px;
+}
+.navbar{
+    height:101.96px;
+    border-bottom: 1px solid  #F1F4F9;
+}
+.headmain{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items: center;
+}
+.searchInput{
+    width:360px ;
+    height:54px ;
+    border-radius:1em;
+    padding: 0px 50px;
+}
+.searchInput::placeholder{
+    color:#809FB8;
+    font-family: "proxima-nova", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19px;
+}
+.searchicon{
+    position: absolute;
+    top: 50px;
+    left: 191px;
+    transform: translateY(-50%);
+    cursor: pointer;     
+}
+.notification{
+    position: relative;
+    left: 129px;
+}
+.adminDetails{
+    position: relative;
+    left: 100px;
+    top: 25px;
+}
+.adminDetails span{
+    color:#17181A;
+    font-family: "proxima-nova", sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin-left: 10px;
+}
+.adminDetails p{
+    color:#809FB8;
+    font-family: "proxima-nova", sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 18px;
+    margin-left: 60px;
+    margin-top: -15px;
+}
+.adminDetails .arrows{
+    position: relative;
+    left: 200px;
+    bottom:40px 
+}
+
+
+
+
+
