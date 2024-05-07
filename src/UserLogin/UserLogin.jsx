@@ -9,11 +9,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./UserLogin.css";
 
+
 const UserLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [otp,setOtp]=useState("")
   const [showOTP, setShowOTP] = useState(false);
-  const [passwordVisible, setPasswordVisible] = useState(false);
   const navigate = useNavigate();
 
   axios.defaults.withCredentials = true;
@@ -21,36 +22,67 @@ const UserLogin = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://eaf2-125-18-168-34.ngrok-free.app/api/users/login/',
-        { username, password}
-        // {
-        //   headers: {
-        //     "access-control-allow-origin" : "*",
-        //     "Content-type": "application/json; charset=UTF-8"
-        //   }
-        // }
+      const response = await axios.post(
+       ' https://763e-125-18-168-34.ngrok-free.app/api/users/authenticate-user/'
+        ,
+        { username, password }
       );
+  
       console.log(response);
-      if (response.data.Login) {
-        navigate('/nav');
+      console.log(response.data.status);
+  
+      if (response.data.status === 'success') {
+        // Save username and password to session storage
+        sessionStorage.setItem('username', username);
+        sessionStorage.setItem('password', password);
+  
+        setShowOTP(true);
       } else {
-        console.log("unable to login")
+        console.log('Unable to login');
       }
     } catch (error) {
       console.error('Error occurred during authentication:', error);
     }
   };
   
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
-  };
+  
   const handleCloseOTP = () => {
     setShowOTP(false);
   };
 
-  const handlelogin = () => {
-    console.log("Hello")
-    navigate('/nav')
+  const handlelogin = async(e) => {
+    e.preventDefault();
+    try {
+      // Retrieve values from session storage
+      
+      const username = sessionStorage.getItem('username');
+      const password = sessionStorage.getItem('password');
+      
+      // Make sure all required values are present
+      // if (!username || !password) {
+      //   console.error('Missing required values in session storage');
+      //   return;
+      // }
+  
+      // Make another API request including username, password, and authentication code
+      const response = await axios.post('https://763e-125-18-168-34.ngrok-free.app/api/users/login/',
+        {
+          username,
+          password,
+          otp,
+        }
+      );
+      
+      console.log(response.data.data.access)
+      
+      sessionStorage.setItem('access', response.data.data.access);
+      sessionStorage.removeItem('username');
+      sessionStorage.removeItem('password');
+      navigate('/nav')
+      
+    } catch (error) {
+      console.error('Error occurred during the API request:', error);
+    }
   }
 
   return (
@@ -137,18 +169,14 @@ const UserLogin = () => {
                   className="form-control"
                   id="otp"
                   placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
                 />
               </div>
               <button type="submit" className="btn-otp" onClick={handlelogin}>
                 Login to your account
               </button>
-              <button
-                type="button"
-                className="btn-resend"
-                
-              >
-                Resend OTP
-              </button>
+             
             </form>
           </div>
         </div>
