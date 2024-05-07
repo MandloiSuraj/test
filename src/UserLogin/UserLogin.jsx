@@ -1,21 +1,40 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logoMain from "../assets/logoMain.png";
 import logoRight from "../assets/logoRight.png";
 import arrow_down from "../assets/arrow_down.png";
-import btn_close from '../assets/btn_close.png'
+import btn_close from "../assets/btn_close.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import QRCode from "qrcode.react";
+
 import axios from "axios";
 import "./UserLogin.css";
-
 
 const UserLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [otp,setOtp]=useState("")
-  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [authOtp, setAuthOtp] = useState(false);
+  const [secret_key, setSecretKey] = useState("");
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
   const navigate = useNavigate();
+
+  const generateSecret = () => {
+    const newSecret = generateRandomSecret();
+    setSecretKey(newSecret);
+    const qrCodeUrl = `otpauth://totp/Reporting?secret=${newSecret}&issuer=Reporting Application`;
+    setQrCodeUrl(qrCodeUrl);
+    console.log(newSecret)
+  };
+  const generateRandomSecret = () => {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    let secret_key = "";
+    for (let i = 0; i < 16; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      secret_key += charset[randomIndex];
+    }
+    return secret_key;
+  };
 
   axios.defaults.withCredentials = true;
 
@@ -23,67 +42,64 @@ const UserLogin = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-       ' https://763e-125-18-168-34.ngrok-free.app/api/users/authenticate-user/'
-        ,
+        " https://763e-125-18-168-34.ngrok-free.app/api/users/login/",
         { username, password }
       );
-  
+
       console.log(response);
       console.log(response.data.status);
-  
-      if (response.data.status === 'success') {
-        // Save username and password to session storage
-        sessionStorage.setItem('username', username);
-        sessionStorage.setItem('password', password);
-  
-        setShowOTP(true);
+      console.log(response.data.data.mfa_enabled);
+
+      if (response.data.status === "success") {
+        sessionStorage.setItem("username", username);
+        sessionStorage.setItem("password", password);
+        if (response.data.data.mfa_enabled == false) {
+          
+          setAuthOtp(true);
+          generateSecret();
+        } else {
+          setSecretKey(null)
+          setAuthOtp(true);
+        }
       } else {
-        console.log('Unable to login');
+        console.log("Unable to login");
       }
     } catch (error) {
-      console.error('Error occurred during authentication:', error);
+      console.error("Error occurred during authentication:", error);
     }
   };
-  
-  
+
   const handleCloseOTP = () => {
-    setShowOTP(false);
+    setAuthOtp(false);
   };
 
-  const handlelogin = async(e) => {
+  const handlelogin = async (e) => {
     e.preventDefault();
     try {
-      // Retrieve values from session storage
-      
-      const username = sessionStorage.getItem('username');
-      const password = sessionStorage.getItem('password');
-      
-      // Make sure all required values are present
-      // if (!username || !password) {
-      //   console.error('Missing required values in session storage');
-      //   return;
-      // }
-  
-      // Make another API request including username, password, and authentication code
-      const response = await axios.post('https://763e-125-18-168-34.ngrok-free.app/api/users/login/',
+      const username = sessionStorage.getItem("username");
+      const password = sessionStorage.getItem("password");
+
+      const response = await axios.post(
+        "https://763e-125-18-168-34.ngrok-free.app/api/users/two-factor-authentication/",
         {
           username,
           password,
           otp,
+          secret_key,
         }
       );
       
-      console.log(response.data.data.access)
-      
-      sessionStorage.setItem('access', response.data.data.access);
-      sessionStorage.removeItem('username');
-      sessionStorage.removeItem('password');
-      navigate('/nav')
-      
+      console.log(response.data.data.access);
+
+      sessionStorage.setItem("access", response.data.data.access);
+      sessionStorage.removeItem("username");
+      sessionStorage.removeItem("password");
+      navigate("/nav");
     } catch (error) {
-      console.error('Error occurred during the API request:', error);
+      console.error("Error occurred during the API request:", error);
     }
-  }
+  };
+  useEffect(() => {}, []);
 
   return (
     <>
@@ -106,7 +122,7 @@ const UserLogin = () => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="sign-up-form">
                 <h1>Sign In</h1>
 
@@ -135,7 +151,7 @@ const UserLogin = () => {
                   <button type="submit" className="signIn">
                     Sign In
                   </button>
-                  <Link to={'/forgot'}>
+                  <Link to={"/forgot"}>
                     <button className="btn-forgot">Forgot Password</button>
                   </Link>
                 </form>
@@ -153,7 +169,7 @@ const UserLogin = () => {
           </div>
         </div>
       </div>
-      {showOTP && (
+      {authOtp && (
         <div className="otp-modal">
           <div className="otp-popup">
             <h1>Verify with Authenticator </h1>
@@ -161,6 +177,8 @@ const UserLogin = () => {
             <p>
               Enter the code shown in the app to make sure everything works fine
             </p>
+              <div className="qrcode">{secret_key ? <QRCode value={qrCodeUrl} /> : <></>}</div>
+            
             <form>
               <div className="form-group">
                 <label htmlFor="otp">Google Authentication code</label>
@@ -176,7 +194,6 @@ const UserLogin = () => {
               <button type="submit" className="btn-otp" onClick={handlelogin}>
                 Login to your account
               </button>
-             
             </form>
           </div>
         </div>
@@ -186,4 +203,3 @@ const UserLogin = () => {
 };
 
 export default UserLogin;
-

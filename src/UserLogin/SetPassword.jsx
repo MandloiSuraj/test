@@ -6,26 +6,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./UserLogin.css";
 
-const ForgotPassword = () => {
+const SetPassword = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showOTP, setShowOTP] = useState(false);
+  
   const navigate = useNavigate();
 
   const handleCreateAccount = (e) => {
     e.preventDefault();
-    // axios.post('http://localhost:5000/login', {username, password })
-    //   .then(response => {
-    //     if(response.data.Login){
-    //         navigate('/dashboard');
-    //     }else{
-    //         navigate('/');
-    //     }
-
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   })
+    
 
     setShowOTP(true);
   };
@@ -106,4 +95,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default SetPassword;

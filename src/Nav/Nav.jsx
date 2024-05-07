@@ -1,13 +1,38 @@
 import React from "react";
+import { useEffect } from "react";
 import "./Nav.css";
 import logoMain from "../assets/logoMain.png";
 import notification from "../assets/notification.png";
 import ellipse from "../assets/Ellipse_1-2.png";
 import search_icon from "../assets/search_icon.png";
 import arrows from "..//assets/arrows.png";
-import EmployeeList from "../AdminDashboard/EmployeeList";
+import axios from "axios";
 
 const Nav = () => {
+  const fetchData = async () => {
+    const accessToken = sessionStorage.getItem("access");
+    console.log(accessToken);
+
+    const url = "https://763e-125-18-168-34.ngrok-free.app/api/users/profile";
+    const headers = {
+      Authorization:
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MTE1NTkyLCJpYXQiOjE3MTUxMTQ2OTIsImp0aSI6IjRmMDBmMjJmZjcyNjQ2NDA5MzNiZmM3ZTFjNzdhNTM0IiwidXNlcl9pZCI6NH0.cqPXvdfMqJMOnWzStuUFLtp84z3drD05U_3z5Ay0zHE",
+        'ngrok-skip-browser-warning': 'true' 
+    };
+
+    axios
+      .get(url, { headers })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <>
       <div id="viewport">
@@ -86,11 +111,9 @@ const Nav = () => {
               Make sure to keep all page content within the
               <code>#content</code>.
             </p>
-            
           </div>
         </div>
       </div>
-      
     </>
   );
 };
