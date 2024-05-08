@@ -3,7 +3,7 @@ import logoMain from "../assets/logoMain.png";
 import logoRight from "../assets/logoRight.png";
 import arrow_down from "../assets/arrow_down.png";
 import btn_close from "../assets/btn_close.png";
-import { Link } from "react-router-dom";
+
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode.react";
 
@@ -13,8 +13,12 @@ import "./UserLogin.css";
 const UserLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [authOtp, setAuthOtp] = useState(false);
+  const [auth, setAuth] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [emailOtp, setEmailOtp] = useState(false);
+  const [otpEmail, setOtpEmail] = useState("");
   const [secret_key, setSecretKey] = useState("");
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const navigate = useNavigate();
@@ -24,7 +28,7 @@ const UserLogin = () => {
     setSecretKey(newSecret);
     const qrCodeUrl = `otpauth://totp/Reporting?secret=${newSecret}&issuer=Reporting Application`;
     setQrCodeUrl(qrCodeUrl);
-    console.log(newSecret)
+    console.log(newSecret);
   };
   const generateRandomSecret = () => {
     const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -42,7 +46,7 @@ const UserLogin = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        " https://763e-125-18-168-34.ngrok-free.app/api/users/login/",
+        " https://be16-125-18-168-34.ngrok-free.app/api/users/login/",
         { username, password }
       );
 
@@ -53,13 +57,12 @@ const UserLogin = () => {
       if (response.data.status === "success") {
         sessionStorage.setItem("username", username);
         sessionStorage.setItem("password", password);
-        if (response.data.data.mfa_enabled == false) {
-          
-          setAuthOtp(true);
+        if (response.data.data.mfa_enabled == true) {
+          setAuth(true);
           generateSecret();
         } else {
-          setSecretKey(null)
-          setAuthOtp(true);
+          setSecretKey(null);
+          setAuth(true);
         }
       } else {
         console.log("Unable to login");
@@ -70,7 +73,9 @@ const UserLogin = () => {
   };
 
   const handleCloseOTP = () => {
-    setAuthOtp(false);
+    setAuth(false);
+    setForgotPassword(false);
+    setEmailOtp(false);
   };
 
   const handlelogin = async (e) => {
@@ -80,7 +85,7 @@ const UserLogin = () => {
       const password = sessionStorage.getItem("password");
 
       const response = await axios.post(
-        "https://763e-125-18-168-34.ngrok-free.app/api/users/two-factor-authentication/",
+        "https://be16-125-18-168-34.ngrok-free.app/api/users/two-factor-authentication/",
         {
           username,
           password,
@@ -88,7 +93,7 @@ const UserLogin = () => {
           secret_key,
         }
       );
-      
+
       console.log(response.data.data.access);
 
       sessionStorage.setItem("access", response.data.data.access);
@@ -98,6 +103,55 @@ const UserLogin = () => {
     } catch (error) {
       console.error("Error occurred during the API request:", error);
     }
+  };
+  const handleResetPassword = () => {
+    setForgotPassword(true);
+  };
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "https://be16-125-18-168-34.ngrok-free.app/api/users/request-password-reset-otp",
+        {
+          email,
+        }
+      );
+
+      console.log(response);
+
+      setForgotPassword(false);
+      setEmailOtp(true);
+      
+    } catch (error) {
+      console.error("Error occurred during server side:", error);
+    }
+    
+  };
+
+  const resetPasswordOtp = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "https://be16-125-18-168-34.ngrok-free.app/api/users/verify-otp",
+        {
+          email,
+          otp: otpEmail,
+        }
+      );
+      console.log(response.data.status);
+      if(response.data.status=='success'){
+        
+        sessionStorage.setItem('email',email)
+        
+        navigate('/setPassword')
+      }
+
+      
+      
+    } catch (error) {
+      console.error("Error occurred during server side:", error);
+    }
+    
   };
   useEffect(() => {}, []);
 
@@ -151,9 +205,10 @@ const UserLogin = () => {
                   <button type="submit" className="signIn">
                     Sign In
                   </button>
-                  <Link to={"/forgot"}>
-                    <button className="btn-forgot">Forgot Password</button>
-                  </Link>
+
+                  <button className="btn-forgot" onClick={handleResetPassword}>
+                    Forgot Password
+                  </button>
                 </form>
               </div>
             </div>
@@ -169,7 +224,7 @@ const UserLogin = () => {
           </div>
         </div>
       </div>
-      {authOtp && (
+      {auth && (
         <div className="otp-modal">
           <div className="otp-popup">
             <h1>Verify with Authenticator </h1>
@@ -177,8 +232,10 @@ const UserLogin = () => {
             <p>
               Enter the code shown in the app to make sure everything works fine
             </p>
-              <div className="qrcode">{secret_key ? <QRCode value={qrCodeUrl} /> : <></>}</div>
-            
+            <div className="qrcode">
+              {secret_key ? <QRCode value={qrCodeUrl} /> : <></>}
+            </div>
+
             <form>
               <div className="form-group">
                 <label htmlFor="otp">Google Authentication code</label>
@@ -193,6 +250,64 @@ const UserLogin = () => {
               </div>
               <button type="submit" className="btn-otp" onClick={handlelogin}>
                 Login to your account
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+      {forgotPassword && (
+        <div className="otp-modal">
+          <div className="otp-popup">
+            <h1>Forgot Password </h1>
+            <img src={btn_close} alt="closebtn" onClick={handleCloseOTP} />
+            <p>Enter your email id to reset your password</p>
+            <form>
+              <div className="form-group">
+                <label htmlFor="Email">Email id</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="email"
+                  placeholder="Enter Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn-otp" onClick={handleSendOtp}>
+                Reset your password
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+      {emailOtp && (
+        <div className="otp-modal">
+          <div className="otp-popup">
+            <h1>Verify OTP</h1>
+            <img src={btn_close} alt="closebtn" onClick={handleCloseOTP} />
+            <p>
+              The Verification code is Shared to user Email id
+              sbmandlo@gmail.com, Please write the otp for resetting the
+              password
+            </p>
+            <form>
+              <div className="form-group">
+                <label htmlFor="Email">OTP</label>
+                <input
+                  type="otp"
+                  className="form-control"
+                  id="otp"
+                  placeholder="Enter Otp"
+                  value={otpEmail}
+                  onChange={(e) => setOtpEmail(e.target.value)}
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn-otp"
+                onClick={resetPasswordOtp}
+              >
+                Reset password
               </button>
             </form>
           </div>

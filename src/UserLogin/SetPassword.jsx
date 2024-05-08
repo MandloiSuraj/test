@@ -7,21 +7,32 @@ import axios from "axios";
 import "./UserLogin.css";
 
 const SetPassword = () => {
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [confirmPassword, setConfirmPasswrod] = useState("");
+
   const navigate = useNavigate();
 
-  const handleCreateAccount = (e) => {
+  const handleSetPassword=async(e)=>{
     e.preventDefault();
-    
+    try {
+      const response = await axios.post(
+        "https://be16-125-18-168-34.ngrok-free.app/api/users/reset-password",
+        {
+          password: password,
+          confirm_password: confirmPassword,
+          email: sessionStorage.getItem('email')
+        }
+      );
+      console.log(response);
+      navigate("/");
+      
 
-    setShowOTP(true);
-  };
-
-  const handleforgotPassword = () => {
-    navigate("/");
-  };
+      
+      
+    } catch (error) {
+      console.error("Error occurred during server side:", error);
+    }
+  }
 
   return (
     <>
@@ -48,13 +59,15 @@ const SetPassword = () => {
               <div className="sign-up-form">
                 <h1>Reset your Password</h1>
 
-                <form onSubmit={handleCreateAccount}>
+                <form onSubmit={handleSetPassword}>
                   <div className="form-group input-with-icon">
                     <label htmlFor="password">Write your Password</label>
                     <input
                       type="password"
                       className="form-control"
                       id="password"
+                      value={password}
+                      onChange={(e)=>setPassword(e.target.value)}
                     />
                   </div>
                   <div className="form-group input-with-icon">
@@ -65,17 +78,18 @@ const SetPassword = () => {
                       type="password"
                       className="form-control"
                       id="password"
+                      value={confirmPassword}
+                      onChange={(e)=>setConfirmPasswrod(e.target.value)}
                     />
                   </div>
-                  {/* <Link to={'/login'}> */}
+
                   <button
                     type="submit"
                     className="signIn"
-                    onClick={handleforgotPassword}
+                    
                   >
                     Sign In
                   </button>
-                  {/* </Link> */}
                 </form>
               </div>
             </div>

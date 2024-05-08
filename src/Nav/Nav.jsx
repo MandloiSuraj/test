@@ -13,7 +13,7 @@ const Nav = () => {
     const accessToken = sessionStorage.getItem("access");
     console.log(accessToken);
 
-    const url = "https://763e-125-18-168-34.ngrok-free.app/api/users/profile";
+    const url = "https://be16-125-18-168-34.ngrok-free.app/api/users/profile";
     const headers = {
       Authorization:
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MTE1NTkyLCJpYXQiOjE3MTUxMTQ2OTIsImp0aSI6IjRmMDBmMjJmZjcyNjQ2NDA5MzNiZmM3ZTFjNzdhNTM0IiwidXNlcl9pZCI6NH0.cqPXvdfMqJMOnWzStuUFLtp84z3drD05U_3z5Ay0zHE",
@@ -106,11 +106,11 @@ const Nav = () => {
             </div>
           </nav>
           <div className="container">
-            <h1>Simple Sidebar</h1>
+            {/* <h1>Simple Sidebar</h1>
             <p>
               Make sure to keep all page content within the
               <code>#content</code>.
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
