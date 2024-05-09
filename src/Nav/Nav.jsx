@@ -44,6 +44,7 @@ const Nav = () => {
         <div id="sidebar">
           <header>
             <img src={logoMain} alt="logo" />
+
           </header>
 
           <div className="sidebar-content">
@@ -115,6 +116,7 @@ const Nav = () => {
               Make sure to keep all page content within the
               <code>#content</code>.
             </p>
+            
           </div>
         </div>
       </div>
