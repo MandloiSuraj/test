@@ -15,6 +15,7 @@ const App = () => {
           <Route path="/setPassword" element={<SetPassword/>} />
           <Route path="/nav" element={<Nav />} />
           <Route path="/list" element={<EmployeeList/>}/>
+          {/* <Route path="/sidebar" element={<BaseLayout/>}/> */}
         </Routes>
       </BrowserRouter>
     </>

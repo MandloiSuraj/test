@@ -46,7 +46,7 @@ const UserLogin = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        " https://be16-125-18-168-34.ngrok-free.app/api/users/login/",
+        " https://1de1-125-18-168-34.ngrok-free.app/api/users/login/",
         { username, password }
       );
 
@@ -121,11 +121,9 @@ const UserLogin = () => {
 
       setForgotPassword(false);
       setEmailOtp(true);
-      
     } catch (error) {
       console.error("Error occurred during server side:", error);
     }
-    
   };
 
   const resetPasswordOtp = async (e) => {
@@ -139,19 +137,14 @@ const UserLogin = () => {
         }
       );
       console.log(response.data.status);
-      if(response.data.status=='success'){
-        
-        sessionStorage.setItem('email',email)
-        
-        navigate('/setPassword')
-      }
+      if (response.data.status == "success") {
+        sessionStorage.setItem("email", email);
 
-      
-      
+        navigate("/setPassword");
+      }
     } catch (error) {
       console.error("Error occurred during server side:", error);
     }
-    
   };
   useEffect(() => {}, []);
 
